@@ -23,7 +23,7 @@ import frc.robot.BotConstants.Shooter;
 import frc.robot.HumanControls.DriverPannel;
 import frc.robot.HumanControls.SingleXboxController;
 import frc.robot.commands.GyroReset;
-import frc.robot.subsystem.CommandSwerveDrivetrain;
+import frc.robot.subsystem.Swerve;
 import frc.robot.subsystem.ShooterAndTurret;
 import frc.robot.subsystem.Intake;
 
@@ -42,7 +42,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
      private final CommandXboxController joystick = new CommandXboxController(0);
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final Swerve drivetrain = TunerConstants.createDrivetrain();
     public final Intake intake = new Intake();
     public final ShooterAndTurret shooterAndTurret = new ShooterAndTurret();
 

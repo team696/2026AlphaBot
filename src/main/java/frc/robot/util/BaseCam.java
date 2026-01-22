@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.util;
 
 import java.util.Optional;
 
@@ -7,7 +7,7 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystem.Swerve;
 
 /**
  * Base Camera Object for handling how cameras will generally be handled

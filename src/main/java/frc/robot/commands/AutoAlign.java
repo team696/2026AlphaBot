@@ -10,7 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystem.CommandSwerveDrivetrain;
+import frc.robot.subsystem.Swerve;
 import frc.robot.util.Field;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -22,7 +22,7 @@ public class AutoAlign extends Command {
       pidController = new PIDController(0.0056, 0.00, 0);
       pidController.enableContinuousInput(-180, 180);
 
-      addRequirements(CommandSwerveDrivetrain.get());
+      addRequirements(Swerve.get());
 
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -41,10 +41,7 @@ public class AutoAlign extends Command {
   }
 
     public Rotation2d target_theta(){
-      return new Rotation2d(Math.atan2(
-        Field.hub_position.getY() - CommandSwerveDrivetrain.get().getPose().getY(),
-        Field.hub_position.getX() - CommandSwerveDrivetrain.get().getPose().getX()
-        ));
+      return new Rotation2d();
     }
 
 
