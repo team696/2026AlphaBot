@@ -32,7 +32,7 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 	private static Swerve m_Swerve;
 
 	LimeLightCam exampleCamera = new LimeLightCam("limelight-front");
-	public Field2d fieldSim = new Field2d();
+	public static Field2d fieldSim = new Field2d();
 
 	public static synchronized Swerve get() {
 		if (m_Swerve == null)

@@ -71,10 +71,10 @@ public abstract class BaseCam {
 			AprilTagResult estimation = oEstimation.get();
 			try {
 				if (!checkEstimation.test(estimation, trust)) {
-					Swerve.get().fieldSim.getObject("Rejected Robot Pose").setPose(estimation.pose);
+					Swerve.fieldSim.getObject("Rejected Robot Pose").setPose(estimation.pose);
 					return false;
 				} else {
-					Swerve.get().fieldSim.getObject("Accepted Robot Pose").setPose(estimation.pose);
+					Swerve.fieldSim.getObject("Accepted Robot Pose").setPose(estimation.pose);
 					addVisionMeasurement.accept(
 							estimation.pose,
 							estimation.time,
