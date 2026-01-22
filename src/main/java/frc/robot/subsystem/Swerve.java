@@ -1,4 +1,4 @@
-package frc.robot.subsystem;
+package frc.robot.subsystems;
 
 import java.util.function.Supplier;
 
@@ -8,35 +8,39 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.LimeLightCam;
+import frc.robot.LimelightHelpers;
 import frc.robot.TunerConstants;
+import frc.robot.BaseCam.AprilTagResult;
+import frc.robot.BaseCam.measurementTrust;
 import frc.robot.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.util.BaseCam.AprilTagResult;
-import frc.robot.util.Field;
-import frc.robot.util.LimeLightCam;
 
-public final class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem, Sendable {
-	private static CommandSwerveDrivetrain m_Swerve;
-	private static LimeLightCam frontTable = new LimeLightCam("limelight-front");
+public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Sendable {
+	private static Swerve m_Swerve;
 
-	public static synchronized CommandSwerveDrivetrain get() {
+	LimeLightCam exampleCamera = new LimeLightCam("limelight-front");
+	public Field2d fieldSim = new Field2d();
+
+	public static synchronized Swerve get() {
 		if (m_Swerve == null)
 			m_Swerve = TunerConstants.createDrivetrain();
 		return m_Swerve;
 	}
 
-	public CommandSwerveDrivetrain(
+	public Swerve(
 			SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
 		super(drivetrainConstants, 0, modules);
 		if (Utils.isSimulation()) {
@@ -46,18 +50,26 @@ public final class CommandSwerveDrivetrain extends TunerSwerveDrivetrain impleme
 
 	@Override
 	public void periodic() {
-		  // This runs 50 times per second
-        frontTable.addVisionEstimate(this::addVisionMeasurement, this::acceptEstimate);    
+		exampleCamera.addVisionEstimate(this::addVisionMeasurement, this::acceptEstimate);
+		fieldSim.setRobotPose(this.getState().Pose);
+		SmartDashboard.putData("field", fieldSim);
 	}
 
-	
-    boolean acceptEstimate(AprilTagResult latestResult) {
-      if(latestResult.distToTag > 3){
-        return false;
-      }
-      return true;
-    }
+	// Untested Code, Not Meant to Actually be used, just an example.
+	boolean acceptEstimate(AprilTagResult latestResult, measurementTrust stdDeviations) {
+		if (latestResult.distToTag > 4)
+			return false; // Disregard measurements if we are more than 4 meters away
+		if (this.getState().Speeds.omegaRadiansPerSecond > 2 * Math.PI)
+			return false; // Disregard measurement if we are spinning faster than 360 deg second
 
+		// Trust The measurement less the further we are
+		double stdDeviationCoefficient = latestResult.distToTag *
+				latestResult.distToTag / 12;
+
+		stdDeviations.translation = .5 * stdDeviationCoefficient;
+		stdDeviations.rotation = .5 * stdDeviationCoefficient;
+		return true;
+	}
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
@@ -82,10 +94,6 @@ public final class CommandSwerveDrivetrain extends TunerSwerveDrivetrain impleme
 				visionMeasurementStdDevs);
 	}
 
-	public Pose2d getPose(){
-		return this.getState().Pose;
-	}
-
 	double m_lastSimTime;
 	Notifier simUpdate;
 
@@ -99,38 +107,7 @@ public final class CommandSwerveDrivetrain extends TunerSwerveDrivetrain impleme
 			/* use the measured time delta, get battery voltage from WPILib */
 			updateSimState(deltaTime, RobotController.getBatteryVoltage());
 		});
-		simUpdate.setName("CommandSwerveDrivetrain Simulation Update");
+		simUpdate.setName("Swerve Simulation Update");
 		simUpdate.startPeriodic(0.005);
 	}
-
-
-	public Command rotateToAngle(Rotation2d targetAngle) {
-    return applyRequest(() -> 
-        new SwerveRequest.FieldCentric()
-            .withVelocityX(0)
-            .withVelocityY(0)
-            .withRotationalRate(calculateRotationSpeed(
-                Rotation2d.fromRadians(m_Swerve.getPose().getRotation().getRadians()), 
-                targetAngle))
-    );
-}
-
-
- public Rotation2d target_theta(){
-      return new Rotation2d(Math.atan2(
-        Field.hub_position.getY() - CommandSwerveDrivetrain.get().getPose().getY(),
-        Field.hub_position.getX() - CommandSwerveDrivetrain.get().getPose().getX()
-        ));
-    }
-
-
-
-private double calculateRotationSpeed(Rotation2d current, Rotation2d target) {
-    double error = target.minus(current).getRadians();
-    double kP = 2.0; // Tune this value
-    return error * kP;
-}
-
-
-
 }

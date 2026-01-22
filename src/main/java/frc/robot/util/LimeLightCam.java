@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot;
 
 import java.util.Optional;
 
@@ -9,7 +9,6 @@ import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-
 /**
  * LimeLight Camera Interface
  */
@@ -85,7 +84,7 @@ public class LimeLightCam extends BaseCam {
 
     return Optional.of(
         new AprilTagResult(latestEstimate.pose,
-            Utils.fpgaToCurrentTime(latestEstimate.timestampSeconds),
+            latestEstimate.timestampSeconds,
             latestEstimate.avgTagDist,
             latestEstimate.tagCount,
             latestEstimate.rawFiducials[0].ambiguity)); // Probably not the best but good enough for now
