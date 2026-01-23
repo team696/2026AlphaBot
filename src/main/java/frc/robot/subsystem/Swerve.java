@@ -3,14 +3,19 @@ package frc.robot.subsystem;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.util.sendable.Sendable;
@@ -20,12 +25,17 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.util.LimeLightCam;
 import frc.robot.util.LimelightHelpers;
+import frc.robot.util.constants;
 import frc.robot.TunerConstants;
+import frc.robot.HumanControls.DriverPannel;
 import frc.robot.util.BaseCam.AprilTagResult;
 import frc.robot.util.BaseCam.measurementTrust;
+import frc.robot.util.constants.DriveConstants;
+import frc.robot.util.constants.FieldConstants;
 import frc.robot.TunerConstants.TunerSwerveDrivetrain;
 
 public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Sendable {
@@ -40,6 +50,11 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		return m_Swerve;
 	}
 
+	 /* Setting up bindings for necessary control of the swerve drive platform */
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+            .withDeadband( DriveConstants.MaxSpeed* 0.25).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
 	public Swerve(
 			SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
 		super(drivetrainConstants, 0, modules);
@@ -53,6 +68,10 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		exampleCamera.addVisionEstimate(this::addVisionMeasurement, this::acceptEstimate);
 		fieldSim.setRobotPose(this.getState().Pose);
 		SmartDashboard.putData("field", fieldSim);
+	}
+
+	public Pose2d getPose(){
+		return Swerve.get().getState().Pose;
 	}
 
 	// Untested Code, Not Meant to Actually be used, just an example.
@@ -109,5 +128,44 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		});
 		simUpdate.setName("Swerve Simulation Update");
 		simUpdate.startPeriodic(0.005);
+	}
+
+	public boolean finishRotation(Rotation2d target){
+	return this.getPose().getRotation() == target;
+	}
+
+	  public Rotation2d target_Theta(){
+      return new Rotation2d(Math.atan2(
+        FieldConstants.hub_position.getY() - Swerve.get().getPose().getY(),
+        FieldConstants.hub_position.getX() - Swerve.get().getPose().getX()
+        )).minus(Swerve.get().getPose().getRotation());
+	  }
+
+  public double rotationSpeed(Rotation2d target){
+ 	PIDController rotationalController = new PIDController(2, 0, 0, .1);
+	 rotationalController.enableContinuousInput(-Math.PI, Math.PI);
+
+	  rotationalController.setTolerance(
+            Math.toRadians(DriveConstants.kToleranceDegree),
+            DriveConstants.kToleranceSpeed);
+
+    Rotation2d currentAngle = Swerve.get().getPose().getRotation();
+
+	double output = rotationalController.calculate(currentAngle.getRadians(), target.getRadians());
+	return MathUtil.clamp(output, -DriveConstants.MaxAngularRate , DriveConstants.MaxAngularRate);
+  }
+
+  public Command rotateToPoint(Rotation2d target){
+    return Commands.run(()->{
+			
+		Swerve.get().drive.
+									withVelocityX(0)
+									.withVelocityY(0)
+									.withRotationalRate(Swerve.get().rotationSpeed(target));
+		}, this).until(() -> this.finishRotation(target))
+		.finallyDo( // to make sure its zero once the command is finished
+		() -> {this.drive.withVelocityX(0)
+			.withVelocityY(0)
+			.withRotationalRate(0);});
 	}
 }
