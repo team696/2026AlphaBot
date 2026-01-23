@@ -15,9 +15,6 @@ import frc.robot.BotConstants;
 public class ShooterAndTurret extends SubsystemBase {
   /** Creates a new ShooterAndTurret. */
       private final TalonFX m_Shooter1;
-      private final TalonFX m_Hood = new TalonFX(BotConstants.Hood.Hood_ID);
-      private final TalonFX m_Turret = new TalonFX(BotConstants.Turret.Turret_ID);
-      private final TalonFX m_TurretBeam = new TalonFX(BotConstants.Turret.Turret_BeamBreakID);
 
 
   public ShooterAndTurret(){

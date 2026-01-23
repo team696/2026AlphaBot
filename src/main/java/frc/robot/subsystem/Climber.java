@@ -12,8 +12,6 @@ import frc.robot.BotConstants;
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
     private final TalonFX m_Climber1 = new TalonFX(BotConstants.Climber.Climber_1_ID);
-    private final TalonFX m_Climber2 = new TalonFX(BotConstants.Climber.Climber_2_ID);
-
 
   public Climber() {}
 
