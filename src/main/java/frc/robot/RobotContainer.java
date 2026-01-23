@@ -24,6 +24,7 @@ import frc.robot.HumanControls.DriverPannel;
 import frc.robot.HumanControls.SingleXboxController;
 import frc.robot.commands.GyroReset;
 import frc.robot.subsystem.Swerve;
+import frc.robot.util.constants.DriveConstants;
 import frc.robot.subsystem.ShooterAndTurret;
 import frc.robot.subsystem.Intake;
 
@@ -32,16 +33,11 @@ public class RobotContainer {
     public final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public final  double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 	
- 
-
-    /* Setting up bindings for necessary control of the swerve drive platform */
+    	 /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.25).withRotationalDeadband(MaxAngularRate * 0.15) // Add a  deadband
+            .withDeadband( DriveConstants.MaxSpeed* 0.25).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
+ 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
      private final CommandXboxController joystick = new CommandXboxController(0);
@@ -49,9 +45,6 @@ public class RobotContainer {
     public final Intake intake = new Intake();
     public final ShooterAndTurret shooterAndTurret = new ShooterAndTurret();
 
-    private boolean isDriverPanelConnected() {
-    return DriverPannel.DriverPanel.isConnected();
-}
 
     public RobotContainer() {
         configureBindings();
@@ -68,35 +61,14 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-
         
-        joystick.rightTrigger().whileTrue(new ParallelCommandGroup(intake.runIntake(),
-            shooterAndTurret.runShooter()));
+        joystick.leftTrigger().whileTrue(shooterAndTurret.runShooter());
+
+        joystick.rightTrigger().whileTrue(intake.runIntake());
        
-            joystick.a().whileTrue(new GyroReset(drivetrain));
+        joystick.a().onTrue((new GyroReset(drivetrain)));
+        joystick.b().onTrue(drivetrain.rotateToPoint(Swerve.get().target_Theta()));
         
-
-        // Idle while the robot is disabled. This ensures the configured
-        // neutral mode is applied to the drive motors while disabled.
-        final var idle = new SwerveRequest.Idle();
-        RobotModeTriggers.disabled().whileTrue(
-            drivetrain.applyRequest(() -> idle).ignoringDisable(true)
-        );
-
-        // // Xboxjoystick.A.whileTrue(drivetrain.applyRequest(() -> brake));
-        // Xboxjoystick.B.whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-Xboxjoystick., -joystick.getLeftX()))
-        // ));
-
-        // // Run SysId routines when holding back/start and X/Y.
-        // // Note that each routine should be run exactly once in a single log.
-        // joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        // // reset the field-centric heading on left bumper press
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
