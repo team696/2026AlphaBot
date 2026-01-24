@@ -33,7 +33,7 @@ public class ShooterAndTurret extends SubsystemBase {
     // first lambda: what to do while running
     // second lambda: what to do when the command ends
     return Commands.runEnd(
-        () -> m_Shooter1.set(-0.50),
+        () -> m_Shooter1.set(-0.40),
         () -> m_Shooter1.set(0),
         this // the subsystem
     );

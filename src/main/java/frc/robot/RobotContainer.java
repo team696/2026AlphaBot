@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,10 +42,15 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
      private final CommandXboxController joystick = new CommandXboxController(0);
-    public final Swerve drivetrain = TunerConstants.createDrivetrain();
     public final Intake intake = new Intake();
     public final ShooterAndTurret shooterAndTurret = new ShooterAndTurret();
 
+    public final SwerveRequest.FieldCentricFacingAngle FCFARequest = 
+    new SwerveRequest.FieldCentricFacingAngle()
+        .withDeadband(DriveConstants.MaxSpeed* 0.1)
+        .withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+        .withHeadingPID(3, 0, 0); 
 
     public RobotContainer() {
         configureBindings();
@@ -53,11 +59,11 @@ public class RobotContainer {
     private void configureBindings() {
       // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
+        Swerve.get().setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            Swerve.get().applyRequest(() ->
+                drive.withVelocityX(joystick.getLeftY() / 2 * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(joystick.getLeftX() / 2 * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -66,11 +72,18 @@ public class RobotContainer {
 
         joystick.rightTrigger().whileTrue(intake.runIntake());
        
-        joystick.a().onTrue((new GyroReset(drivetrain)));
-        joystick.b().onTrue(drivetrain.rotateToPoint(Swerve.get().target_Theta()));
+        joystick.a().onTrue((new GyroReset(Swerve.get())));
         
+        joystick.b().whileTrue(
+            // Drivetrain will execute this command periodically
+            Swerve.get().applyRequest(() ->
+                FCFARequest.withVelocityX(joystick.getLeftY() / 2 * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(joystick.getLeftX() / 2 * MaxSpeed) // Drive left with negative X (left)
+                    .withTargetDirection(Swerve.get().target_Theta())
+            )
+        );
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        Swerve.get().registerTelemetry(logger::telemeterize);
     }
 
     public Command getAutonomousCommand() {

@@ -1,5 +1,6 @@
 package frc.robot.subsystem;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
@@ -39,8 +40,7 @@ import frc.robot.util.constants.FieldConstants;
 import frc.robot.TunerConstants.TunerSwerveDrivetrain;
 
 public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Sendable {
-	private static Swerve m_Swerve;
-
+	private static Swerve m_Swerve;	
 	LimeLightCam exampleCamera = new LimeLightCam("limelight-front");
 	public static Field2d fieldSim = new Field2d();
 
@@ -58,6 +58,7 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 	public Swerve(
 			SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
 		super(drivetrainConstants, 0, modules);
+
 		if (Utils.isSimulation()) {
 			simulationInit();
 		}
@@ -68,6 +69,7 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		exampleCamera.addVisionEstimate(this::addVisionMeasurement, this::acceptEstimate);
 		fieldSim.setRobotPose(this.getState().Pose);
 		SmartDashboard.putData("field", fieldSim);
+		SmartDashboard.putNumber("target theta degrees", Swerve.get().target_Theta().getDegrees());
 	}
 
 	public Pose2d getPose(){
@@ -138,34 +140,9 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
       return new Rotation2d(Math.atan2(
         FieldConstants.hub_position.getY() - Swerve.get().getPose().getY(),
         FieldConstants.hub_position.getX() - Swerve.get().getPose().getX()
-        )).minus(Swerve.get().getPose().getRotation());
-	  }
+        ));}
 
-  public double rotationSpeed(Rotation2d target){
- 	PIDController rotationalController = new PIDController(2, 0, 0, .1);
-	 rotationalController.enableContinuousInput(-Math.PI, Math.PI);
 
-	  rotationalController.setTolerance(
-            Math.toRadians(DriveConstants.kToleranceDegree),
-            DriveConstants.kToleranceSpeed);
 
-    Rotation2d currentAngle = Swerve.get().getPose().getRotation();
-
-	double output = rotationalController.calculate(currentAngle.getRadians(), target.getRadians());
-	return MathUtil.clamp(output, -DriveConstants.MaxAngularRate , DriveConstants.MaxAngularRate);
-  }
-
-  public Command rotateToPoint(Rotation2d target){
-    return Commands.run(()->{
-			
-		Swerve.get().drive.
-									withVelocityX(0)
-									.withVelocityY(0)
-									.withRotationalRate(Swerve.get().rotationSpeed(target));
-		}, this).until(() -> this.finishRotation(target))
-		.finallyDo( // to make sure its zero once the command is finished
-		() -> {this.drive.withVelocityX(0)
-			.withVelocityY(0)
-			.withRotationalRate(0);});
-	}
+  
 }
