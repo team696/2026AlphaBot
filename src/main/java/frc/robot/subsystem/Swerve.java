@@ -50,11 +50,7 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		return m_Swerve;
 	}
 
-	 /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband( DriveConstants.MaxSpeed* 0.25).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-
+	
 	public Swerve(
 			SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
 		super(drivetrainConstants, 0, modules);
@@ -67,6 +63,7 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 	@Override
 	public void periodic() {
 		exampleCamera.addVisionEstimate(this::addVisionMeasurement, this::acceptEstimate);
+		exampleCamera.SetRobotOrientation(Swerve.get().getPose().getRotation()); //now the robots orientation is the lime light
 		fieldSim.setRobotPose(this.getState().Pose);
 		SmartDashboard.putData("field", fieldSim);
 		SmartDashboard.putNumber("target theta degrees", Swerve.get().target_Theta().getDegrees());

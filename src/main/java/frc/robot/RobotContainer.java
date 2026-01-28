@@ -36,7 +36,7 @@ public class RobotContainer {
 	
     	 /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband( DriveConstants.MaxSpeed* 0.25).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
+            .withDeadband( DriveConstants.MaxSpeed* 0.15).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
  
     private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -47,10 +47,10 @@ public class RobotContainer {
 
     public final SwerveRequest.FieldCentricFacingAngle FCFARequest = 
     new SwerveRequest.FieldCentricFacingAngle()
-        .withDeadband(DriveConstants.MaxSpeed* 0.1)
+        .withDeadband(DriveConstants.MaxSpeed* 0.15)
         .withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-        .withHeadingPID(3, 0, 0); 
+        .withHeadingPID(5, 0, .1); 
 
     public RobotContainer() {
         configureBindings();
