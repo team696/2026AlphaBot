@@ -66,7 +66,7 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		exampleCamera.SetRobotOrientation(Swerve.get().getPose().getRotation()); //now the robots orientation is the lime light
 		fieldSim.setRobotPose(this.getState().Pose);
 		SmartDashboard.putData("field", fieldSim);
-		SmartDashboard.putNumber("target theta degrees", Swerve.get().target_Theta().getDegrees());
+		SmartDashboard.putNumber("target theta degrees", Swerve.get().hub_target_Theta().getDegrees());
 	}
 
 	public Pose2d getPose(){
@@ -133,12 +133,23 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 	return this.getPose().getRotation() == target;
 	}
 
-	  public Rotation2d target_Theta(){
+	  public Rotation2d hub_target_Theta(){
       return new Rotation2d(Math.atan2(
         FieldConstants.hub_position.getY() - Swerve.get().getPose().getY(),
         FieldConstants.hub_position.getX() - Swerve.get().getPose().getX()
         ));}
 
+public Rotation2d blue_corner1_Theta(){
+      return new Rotation2d(Math.atan2(
+        0 - Swerve.get().getPose().getY(),
+       0 - Swerve.get().getPose().getX()
+        ));}
+
+		public Rotation2d blue_corner3_Theta(){
+      return new Rotation2d(Math.atan2(
+         316.64  - Swerve.get().getPose().getY(),
+      0- Swerve.get().getPose().getX()
+        ));}
 
 
   
