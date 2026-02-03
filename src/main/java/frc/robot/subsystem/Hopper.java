@@ -6,6 +6,7 @@ package frc.robot.subsystem;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.BotConstants;
 
@@ -18,6 +19,11 @@ public class Hopper extends SubsystemBase {
 
   /** Creates a new Hopper. */
   public Hopper() {}
+
+
+  public Command fahhh(){
+    return run(()->m_Hopper.stopMotor());
+  }
 
   @Override
   public void periodic() {
