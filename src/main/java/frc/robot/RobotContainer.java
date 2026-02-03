@@ -36,7 +36,7 @@ public class RobotContainer {
 	
     	 /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband( DriveConstants.MaxSpeed* 0.25).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
+            .withDeadband( DriveConstants.MaxSpeed* 0.15).withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
  
     private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -47,10 +47,10 @@ public class RobotContainer {
 
     public final SwerveRequest.FieldCentricFacingAngle FCFARequest = 
     new SwerveRequest.FieldCentricFacingAngle()
-        .withDeadband(DriveConstants.MaxSpeed* 0.1)
-        .withRotationalDeadband(DriveConstants.MaxAngularRate * 0.15) // Add a  deadband
+        .withDeadband(DriveConstants.MaxSpeed* .01)
+        .withRotationalDeadband(DriveConstants.MaxAngularRate * .01) // Add a  deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-        .withHeadingPID(3, 0, 0); 
+        .withHeadingPID(20, 0, 0); 
 
     public RobotContainer() {
         configureBindings();
@@ -62,8 +62,8 @@ public class RobotContainer {
         Swerve.get().setDefaultCommand(
             // Drivetrain will execute this command periodically
             Swerve.get().applyRequest(() ->
-                drive.withVelocityX(joystick.getLeftY() / 2 * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.getLeftX() / 2 * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX((joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY((joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -77,9 +77,25 @@ public class RobotContainer {
         joystick.b().whileTrue(
             // Drivetrain will execute this command periodically
             Swerve.get().applyRequest(() ->
-                FCFARequest.withVelocityX(joystick.getLeftY() / 2 * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.getLeftX() / 2 * MaxSpeed) // Drive left with negative X (left)
-                    .withTargetDirection(Swerve.get().target_Theta())
+                FCFARequest.withVelocityX((joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY((joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
+                    .withTargetDirection(Swerve.get().hub_target_Theta())
+            )
+        );
+        joystick.x().whileTrue(
+            // Drivetrain will execute this command periodically
+            Swerve.get().applyRequest(() ->
+                FCFARequest.withVelocityX((joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY((joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
+                    .withTargetDirection(Swerve.get().blue_corner1_Theta())
+            )
+        );
+        joystick.y().whileTrue(
+            // Drivetrain will execute this command periodically
+            Swerve.get().applyRequest(() ->
+                FCFARequest.withVelocityX((joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY((joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
+                    .withTargetDirection(Swerve.get().blue_corner3_Theta())
             )
         );
 

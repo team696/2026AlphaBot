@@ -7,8 +7,6 @@ package frc.robot;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-import edu.wpi.first.wpilibj2.command.Command;
-
 
 /** Add your docs here. */
 public class BotConstants {
@@ -37,16 +35,6 @@ public class BotConstants {
 
         static{
             //Tis where the config will go, too lazy to write it rn
-        }
-
-        public static Object get() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'get'");
-        }
-
-        public Command fahhh() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'fahhh'");
         }
     }
 
