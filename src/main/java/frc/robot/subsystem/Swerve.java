@@ -63,7 +63,6 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 	@Override
 	public void periodic() {
 		exampleCamera.addVisionEstimate(this::addVisionMeasurement, this::acceptEstimate);
-		exampleCamera.SetRobotOrientation(Swerve.get().getPose().getRotation()); //now the robots orientation is the lime light
 		fieldSim.setRobotPose(this.getState().Pose);
 		SmartDashboard.putData("field", fieldSim);
 		SmartDashboard.putNumber("target theta degrees", Swerve.get().hub_target_Theta().getDegrees());
@@ -151,6 +150,11 @@ public Rotation2d blue_corner1_Theta(){
       0- Swerve.get().getPose().getX()
         ));}
 
+		
+public Command fakeCommand() {
+    System.out.println("Something happened");
+	return Commands.none();
+}
 
   
 }

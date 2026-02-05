@@ -12,6 +12,7 @@ import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -50,7 +51,8 @@ public class RobotContainer {
         .withDeadband(DriveConstants.MaxSpeed* .01)
         .withRotationalDeadband(DriveConstants.MaxAngularRate * .01) // Add a  deadband
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-        .withHeadingPID(20, 0, 0); 
+        .withHeadingPID(5., 0, 0).withMaxAbsRotationalRate(DegreesPerSecond.of(360))
+        .withRotationalDeadband(DegreesPerSecond.of(1)); 
 
     public RobotContainer() {
         configureBindings();
@@ -62,8 +64,8 @@ public class RobotContainer {
         Swerve.get().setDefaultCommand(
             // Drivetrain will execute this command periodically
             Swerve.get().applyRequest(() ->
-                drive.withVelocityX((joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY((joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX((-joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY((-joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -77,8 +79,8 @@ public class RobotContainer {
         joystick.b().whileTrue(
             // Drivetrain will execute this command periodically
             Swerve.get().applyRequest(() ->
-                FCFARequest.withVelocityX((joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY((joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
+                FCFARequest.withVelocityX((-joystick.getLeftY() / 2) * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY((-joystick.getLeftX() / 2) * MaxSpeed) // Drive left with negative X (left)
                     .withTargetDirection(Swerve.get().hub_target_Theta())
             )
         );

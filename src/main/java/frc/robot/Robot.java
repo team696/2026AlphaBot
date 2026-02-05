@@ -4,17 +4,37 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystem.Swerve;
+import frc.robot.util.Auto;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
 
+  
+
   public Robot() {
     m_robotContainer = new RobotContainer();
+
+
+
+     Auto.initialize(
+            new Auto.NamedCommand("shoot", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Intake", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Reset Intake", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Climb L1", Swerve.get().fakeCommand())
+        );
+
   }
 
   @Override
@@ -33,10 +53,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = Auto.getSelectedAuto();
 
     if (m_autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+      m_autonomousCommand.schedule();
     }
   }
 
