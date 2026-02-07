@@ -43,6 +43,9 @@ public class Robot extends TimedRobot {
 
 
 
+<<<<<<< HEAD
+  
+=======
      Auto.initialize(
             new Auto.NamedCommand("shoot", Swerve.get().fakeCommand()),
             new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
@@ -56,6 +59,7 @@ public class Robot extends TimedRobot {
                     .withTargetDirection(Swerve.get().hub_target_Theta())))
             
         );
+>>>>>>> 5de2db1b0a63392528bab2163ded7b95911343cb
 
   }
 

@@ -9,6 +9,11 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+<<<<<<< HEAD
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
+=======
+>>>>>>> 5de2db1b0a63392528bab2163ded7b95911343cb
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -19,6 +24,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+<<<<<<< HEAD
+import edu.wpi.first.math.util.Units;
+=======
+>>>>>>> 5de2db1b0a63392528bab2163ded7b95911343cb
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Notifier;
@@ -156,5 +165,26 @@ public Command fakeCommand() {
 	return Commands.none();
 }
 
+<<<<<<< HEAD
+	// Since we are using a holonomic drivetrain, the rotation component of this pose
+	// represents the goal holonomic rotation
+	Pose2d targetPose = new Pose2d(Units.inchesToMeters(91.055), 
+							Units.inchesToMeters(147.47), Rotation2d.fromDegrees(0));
+
+	// Create the constraints to use while pathfinding
+	PathConstraints constraints = new PathConstraints(
+        3.0, 4.0,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+public Command alignToClimb(){
+	// Since AutoBuilder is configured, we can use it to build pathfinding commands
+	return AutoBuilder.pathfindToPose(
+        targetPose,
+        constraints,
+        0.0); // Goal end velocity in meters/sec
+}
+
+=======
+>>>>>>> 5de2db1b0a63392528bab2163ded7b95911343cb
   
 }
