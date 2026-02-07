@@ -26,6 +26,7 @@ import frc.robot.HumanControls.DriverPannel;
 import frc.robot.HumanControls.SingleXboxController;
 import frc.robot.commands.GyroReset;
 import frc.robot.subsystem.Swerve;
+import frc.robot.util.Auto;
 import frc.robot.util.constants.DriveConstants;
 import frc.robot.subsystem.ShooterAndTurret;
 import frc.robot.subsystem.Intake;
@@ -55,6 +56,15 @@ public class RobotContainer {
         .withRotationalDeadband(DegreesPerSecond.of(1)); 
 
     public RobotContainer() {
+    Auto.initialize(
+            new Auto.NamedCommand("shoot", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Intake", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Reset Intake", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Climb L1", Swerve.get().fakeCommand())
+        );
+
         configureBindings();
     }
 
@@ -100,6 +110,8 @@ public class RobotContainer {
                     .withTargetDirection(Swerve.get().blue_corner3_Theta())
             )
         );
+
+        joystick.rightBumper().onTrue(Swerve.get().alignToClimb());
 
         Swerve.get().registerTelemetry(logger::telemeterize);
     }
