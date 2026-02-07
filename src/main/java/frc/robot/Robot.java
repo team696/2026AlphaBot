@@ -26,7 +26,18 @@ public class Robot extends TimedRobot {
 
 
 
+<<<<<<< HEAD
   
+=======
+     Auto.initialize(
+            new Auto.NamedCommand("shoot", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Pass_1", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Intake", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Reset Intake", Swerve.get().fakeCommand()),
+            new Auto.NamedCommand("Climb L1", Swerve.get().fakeCommand())
+        );
+>>>>>>> 5de2db1b0a63392528bab2163ded7b95911343cb
 
   }
 
